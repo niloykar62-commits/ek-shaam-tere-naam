@@ -1,0 +1,1075 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0e2c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ek Shaam Tere Naam">
+<meta property="og:title" content="A song for you: Ek Shaam Tere Naam">
+<meta property="og:description" content="An original Hindi love song with a short film drawn fresh for every name. Press play.">
+<meta property="og:url" content="https://ek-shaam-tere-naam.vercel.app/">
+<meta property="og:image" content="https://ek-shaam-tere-naam.vercel.app/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Two people holding hands on a hill under the moon, with floating lanterns and the title Ek Shaam Tere Naam">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="A song for you: Ek Shaam Tere Naam">
+<meta name="twitter:description" content="An original Hindi love song with a short film drawn fresh for every name. Press play.">
+<meta name="twitter:image" content="https://ek-shaam-tere-naam.vercel.app/og-image.png">
+<link rel="canonical" href="https://ek-shaam-tere-naam.vercel.app/">
+<meta name="description" content="An original Hindi love song with an animated evening film drawn fresh for every name.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Ek Shaam Tere Naam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap">
+<style>
+/* Layout concept: one framed "film" (canvas stage, lyric strip, controls) over a quiet page of written lyrics.
+   Deliberately a single night-time look: the whole piece is an evening turning to dusk and back to night. */
+:root{
+  --night:#0b0e2c;
+  --panel:rgba(12,14,44,.78);
+  --panel2:#10133a;
+  --ink:#f3edfb;
+  --mute:#a9a3c9;
+  --rose:#ff92aa;
+  --gold:#ffd488;
+  --line:rgba(255,255,255,.15);
+  --fd:'Tiro Devanagari Hindi','Noto Serif Devanagari','Kohinoor Devanagari',serif;
+  --fb:'Hind','Noto Sans Devanagari','Kohinoor Devanagari',system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--night);color:var(--ink);font-family:var(--fb);line-height:1.5;padding-inline:16px;padding-block:20px 56px}
+.wrap{max-width:1040px;margin-inline:auto;display:grid;gap:28px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:4px 16px;flex-wrap:wrap}
+.brand{font-family:var(--fd);font-size:1.4rem;margin:0}
+.top p{margin:0;color:var(--mute);font-size:.92rem}
+.film{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel2)}
+.stage{position:relative;aspect-ratio:16/9;background:var(--night)}
+@media (max-width:640px){.stage{aspect-ratio:3/4}}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.veil{position:absolute;inset:0;display:grid;place-items:center;padding:14px;overflow-y:auto;background:rgba(8,9,30,.5)}
+.card{width:min(440px,100%);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px;display:grid;gap:12px;backdrop-filter:blur(6px)}
+.card h1,.card h2{font-family:var(--fd);font-weight:400;margin:0;line-height:1.15;text-wrap:balance}
+.card h1{font-size:clamp(1.9rem,6vw,2.7rem)}
+.card h2{font-size:clamp(1.6rem,5vw,2.2rem)}
+.roman{margin:0;color:var(--rose);font-style:italic}
+.card p{margin:0;color:var(--mute);font-size:.95rem}
+.field{display:grid;gap:6px}
+.field label{font-size:.85rem;letter-spacing:.06em;color:var(--ink)}
+input[type=text],textarea{width:100%;font:inherit;color:var(--ink);background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:6px;padding:11px 12px}
+textarea{min-height:120px;resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--mute)}
+.btn{font:inherit;font-weight:600;padding:10px 18px;border-radius:6px;border:1px solid transparent;cursor:pointer;transition:filter .15s}
+.btn.main{background:var(--gold);color:#2b1740}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:hover{filter:brightness(1.12)}
+.btn:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--rose);outline-offset:2px}
+.small{font-size:.82rem;color:var(--mute)}
+.row2{display:flex;flex-wrap:wrap;gap:10px}
+.lyric{padding:18px 16px 20px;text-align:center;min-height:11.5rem;display:grid;align-content:center;gap:4px;border-top:1px solid var(--line)}
+.sec{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);min-height:1.2em;margin:0}
+.hi{font-family:var(--fd);font-size:clamp(1.5rem,4.6vw,2.4rem);line-height:1.3;text-wrap:balance;margin:0}
+.hi .w{display:inline-block;animation:rise .7s both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tr{color:var(--rose);font-style:italic;margin:0}
+.en{color:var(--mute);margin:0;font-size:.95rem}
+.ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 16px;border-top:1px solid var(--line)}
+.bar{flex:1 1 140px;min-width:0;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--gold)}
+.clock{font-variant-numeric:tabular-nums;color:var(--mute);font-size:.9rem}
+h2.sh{font-family:var(--fd);font-weight:400;font-size:1.6rem;margin:0 0 4px}
+.lead{margin:0 0 16px;color:var(--mute);max-width:62ch}
+.blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:24px}
+.blk{min-width:0;display:grid;gap:10px;align-content:start}
+.blk h3{margin:0;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.blk h3 span{display:block;color:var(--mute);letter-spacing:.04em;text-transform:none;font-weight:400;font-size:.85rem}
+.ln{padding:8px 12px;border-left:2px solid var(--line);display:grid;gap:1px}
+.ln.now{border-color:var(--gold);background:rgba(255,212,136,.08)}
+.ln .h{font-family:var(--fd);font-size:1.15rem}
+.ln .t{font-style:italic;color:var(--rose);font-size:.92rem}
+.ln .e{color:var(--mute);font-size:.9rem}
+details{border-top:1px solid var(--line);padding-top:14px}
+summary{cursor:pointer;font-weight:600}
+.own{display:grid;gap:12px;margin-top:14px;max-width:62ch}
+.own p{margin:0;color:var(--mute);font-size:.95rem}
+input[type=file]{font:inherit;color:var(--mute);max-width:100%}
+.note{color:var(--mute);font-size:.92rem;margin:0;max-width:66ch}
+.note code{color:var(--gold);font-family:inherit;font-weight:600}
+.forline{font-family:var(--fd);font-size:1.25rem;color:var(--gold)!important}
+a.btn{display:inline-block;text-decoration:none}
+.letter{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:rgba(255,255,255,.05);max-height:11rem;overflow:auto}
+.letter p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--fd);font-size:1.1rem;line-height:1.5;color:var(--ink)}
+.letter p.from{margin-top:8px;text-align:right;color:var(--gold);font-style:italic;font-size:1rem}
+.creator{display:grid;gap:14px;border-top:1px solid var(--line);padding-top:24px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.cgrid .wide{grid-column:1/-1}
+.cgrid .field,.creator .field{min-width:0}
+.copyrow{display:flex;flex-wrap:wrap;gap:10px}
+.copyrow input{flex:1 1 220px;min-width:0}
+.steps{margin:0;padding-left:1.3rem;display:grid;gap:8px;color:var(--mute);font-size:.95rem}
+#cue{display:grid;gap:6px;font-size:.92rem;max-height:17rem;overflow:auto;padding-right:6px}
+.cuerow{display:grid;grid-template-columns:3rem 1fr;gap:10px}
+.cuet{font-variant-numeric:tabular-nums;color:var(--gold)}
+.cuerow span:last-child{min-width:0;overflow-wrap:anywhere}
+input[type=range]{accent-color:var(--gold);min-width:0}
+@media (prefers-reduced-motion:reduce){.hi .w{animation:none}}
+</style>
+<style>html{background:#0b0e2c;color-scheme:dark}body{margin:0;font-size:14px}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="brand">एक शाम तेरे नाम</p>
+    <p id="for">An original Hindi love song, 2 minutes</p>
+  </header>
+
+  <section class="film" aria-label="Song film">
+    <div class="stage">
+      <canvas id="cv" aria-label="Animated evening scene of two people walking toward each other under the moon"></canvas>
+
+      <div class="veil" id="intro">
+        <form class="card" id="f" autocomplete="off">
+          <div>
+            <h1>एक शाम तेरे नाम</h1>
+            <p class="roman">Ek shaam tere naam</p>
+          </div>
+          <p>A Hindi love song written for this page, with a short film that is drawn fresh for every name. The tune plays as music and the words appear line by line.</p>
+          <p class="forline" id="forline" hidden></p>
+          <div class="field" id="fieldwrap">
+            <label for="name">Whose name goes in the chorus?</label>
+            <input type="text" id="name" maxlength="24" placeholder="For example, Priya">
+          </div>
+          <div class="row2"><button class="btn main" type="submit" id="go">Play the film</button></div>
+          <span class="small" id="hintsmall">Sound starts when you press Play. Leave the name empty to use "Jaan".</span>
+        </form>
+      </div>
+
+      <div class="veil" id="end" hidden>
+        <div class="card">
+          <h2 id="endhi"></h2>
+          <p class="roman" id="endtr"></p>
+          <p id="endtx">This evening is in your name.</p>
+          <div class="letter" id="letter" hidden><p id="lettertx"></p><p class="from" id="letterfrom"></p></div>
+          <div class="row2">
+            <button class="btn main" type="button" id="again1">Watch again</button>
+            <button class="btn ghost" type="button" id="chg1">Try another name</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lyric" id="lyric" aria-live="polite">
+      <p class="sec" id="sec"></p>
+      <p class="hi" id="hi">शुरू करने के लिए प्ले दबाइए</p>
+      <p class="tr" id="tr">Shuru karne ke liye play dabaiye</p>
+      <p class="en" id="en">Press Play to begin.</p>
+    </div>
+
+    <div class="ctrl">
+      <button class="btn main" type="button" id="playbtn">Play</button>
+      <button class="btn ghost" type="button" id="chg2">Change name</button>
+      <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+      <span class="clock" id="clock">0:00 / 2:00</span>
+    </div>
+  </section>
+
+  <section class="creator" id="mine">
+    <h2 class="sh">Use your own photos and voice</h2>
+    <p class="lead">Pick pictures and a recording from your phone or computer. The film uses them straight away and remembers them on this device for next time. Nothing is uploaded.</p>
+    <div class="cgrid">
+      <div class="field"><label for="u-photos">Photos of the two of you (up to 8)</label><input type="file" id="u-photos" accept="image/*" multiple><span class="small" id="u-pstatus">No photos added.</span></div>
+      <div class="field"><label for="u-voice">A recording of the song being sung</label><input type="file" id="u-voice" accept="audio/*"><span class="small" id="u-vstatus">No recording added. The instrumental tune plays.</span></div>
+      <div class="field wide">
+        <label for="u-nudge">If the words come too early or too late, slide this</label>
+        <div class="copyrow"><input type="range" id="u-nudge" min="-4" max="4" step="0.1" value="0" style="flex:1 1 220px"><span class="small" id="u-nval">0.0 s</span></div>
+        <span class="small">Left makes the words earlier and right makes them later. For the best match, sing over the backing track from "Add a real singing voice" further down.</span>
+      </div>
+    </div>
+    <div class="row2">
+      <button class="btn main" type="button" id="u-go">Watch it with my files</button>
+      <button class="btn ghost" type="button" id="u-clear">Remove my files</button>
+    </div>
+    <span class="small">Files added here stay on this device only. To show them to other people they have to be uploaded to your site, as described in the sections further down.</span>
+  </section>
+
+  <section>
+    <h2 class="sh">The words</h2>
+    <p class="lead">Written for this page. The mukhda is the refrain and comes back at the end. The key is D, the tempo 72 beats a minute, and the tune is played by synthesized strings with a tanpura-style drone underneath.</p>
+    <div class="blocks" id="blocks"></div>
+  </section>
+
+  <section>
+    <details>
+      <summary>Play the film with a song of your own</summary>
+      <div class="own">
+        <p>Pick an audio file from your own device and the film will play along to it. If you also type the words, they are shown one line at a time and spread evenly across the song. Everything stays on your device and nothing is uploaded.</p>
+        <div class="field">
+          <label for="audio-file">Audio file</label>
+          <input type="file" id="audio-file" accept="audio/*">
+        </div>
+        <div class="field">
+          <label for="own-lyrics">Your lyrics, one line per row (optional)</label>
+          <textarea id="own-lyrics" placeholder="Type or paste the lines you want shown"></textarea>
+        </div>
+        <div class="row2"><button class="btn ghost" type="button" id="own-reset">Go back to the original tune</button></div>
+        <span class="small" id="own-status">Using the original tune.</span>
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <details>
+      <summary>Add a real singing voice</summary>
+      <div class="own">
+        <p>The tune on this page is played by instruments. To add a voice, sing the song over a backing track and upload the finished recording. The page then plays your recording instead, and the words stay in time with it.</p>
+        <ol class="steps">
+          <li>Press the button below to make the backing track, then download it.</li>
+          <li>Wear headphones, play the backing track and record yourself singing along with any voice recorder or music app. The line start times are listed below.</li>
+          <li>Mix your voice with the backing track and export one audio file of about two minutes. Keep the music starting right at the beginning, with no silence trimmed off.</li>
+          <li>Name the file song.mp3 and upload it to a folder called song on GitHub, so its path is song/song.mp3.</li>
+        </ol>
+        <div class="row2">
+          <button class="btn main" type="button" id="bt-make">Make the backing track</button>
+          <a class="btn ghost" id="bt-dl" href="#" hidden>Download backing track (WAV)</a>
+        </div>
+        <span class="small" id="bt-status"></span>
+        <div id="cue" aria-label="When each line starts"></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="creator" id="creator">
+    <h2 class="sh">Make a link for someone you love</h2>
+    <p class="lead">Their name goes into the song, and your message appears as a letter when the film ends. Everything is stored inside the link itself, so there is nothing to sign up for.</p>
+    <div class="cgrid">
+      <div class="field"><label for="c-name">Their name</label><input type="text" id="c-name" maxlength="24" placeholder="For example, Priya"></div>
+      <div class="field"><label for="c-from">Your name, shown under the letter</label><input type="text" id="c-from" maxlength="24" placeholder="Optional"></div>
+      <div class="field wide"><label for="c-msg">Your message</label><textarea id="c-msg" maxlength="300" placeholder="Write a few lines from the heart"></textarea><span class="small" id="c-count">0 / 300</span></div>
+      <div class="field"><label for="c-set">Photo folder name (optional)</label><input type="text" id="c-set" maxlength="30" placeholder="For example, priya"><span class="small">Photos appear during the chorus. They come from the folder photos/this-name on your site, named 1.jpg, 2.jpg and so on. Leave this empty to use the main photos folder. Anyone with the link can see these photos.</span></div>
+    </div>
+    <div class="field">
+      <label for="c-link">Your link</label>
+      <div class="copyrow"><input type="text" id="c-link" readonly><button class="btn main" type="button" id="c-copy">Copy link</button></div>
+    </div>
+    <div class="row2">
+      <a class="btn ghost" id="c-wa" href="#" target="_blank" rel="noopener">Send on WhatsApp</a>
+      <button class="btn ghost" type="button" id="c-try">Try it here first</button>
+    </div>
+    <span class="small" id="c-status"></span>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var clamp=function(v,a,b){return Math.min(b,Math.max(a,v))};
+var lerp=function(a,b,u){return a+(b-a)*u};
+var ease=function(u){return u*u*(3-2*u)};
+var smooth=function(p,a,b){return ease(clamp((p-a)/(b-a),0,1))};
+
+/* ---------- timeline ---------- */
+var BPM=72,BEAT=60/BPM,BAR=BEAT*4,LINE=BAR*2,INTRO=BAR*2,D=INTRO+LINE*16+BAR*2; /* 120 s */
+
+var SONG=[
+ {label:'अंतरा · Antara',gloss:'first verse',lines:[
+  ['शाम ढली तो चाँद ने पूछा','Shaam dhali to chaand ne poochha','When evening fell, the moon asked'],
+  ['किसकी राह में बैठा है तू','Kiski raah mein baitha hai tu','whose road are you sitting by?'],
+  ['मैंने कहा बस एक नाम है','Maine kaha bas ek naam hai','I said, there is only one name'],
+  ['जिसमें मेरी हर सुबह है','Jismein meri har subah hai','in which every morning of mine lives']]},
+ {label:'मुखड़ा · Mukhda',gloss:'the refrain, sung twice',lines:[
+  ['{n}, तू जो मिले तो','{n}, tu jo mile to','{n}, when you are near'],
+  ['रात भी रोशन हो जाए','Raat bhi roshan ho jaaye','even the night lights up'],
+  ['तेरी हँसी की धुन पे दिल','Teri hansi ki dhun pe dil','to the tune of your laughter, my heart'],
+  ['हर ग़म को भूल जाए','Har gham ko bhool jaaye','forgets every sorrow']]},
+ {label:'अंतरा · Antara',gloss:'second verse',lines:[
+  ['हाथों में तेरे हाथ हो','Haathon mein tere haath ho','with your hand in mine'],
+  ['और खुला आसमान हो','Aur khula aasmaan ho','and an open sky above'],
+  ['बारिश की बूँदों में कहीं','Baarish ki boondon mein kahin','somewhere in the raindrops'],
+  ['अपना भी एक जहान हो','Apna bhi ek jahaan ho','let there be a world of our own']]}
+];
+var ORDER=[0,1,2,1];
+
+/* ---------- state ---------- */
+var nameIn=$('#name');
+var nm=function(){return nameIn.value.trim().replace(/\s+/g,' ').slice(0,24)||'Jaan'};
+var playName='Jaan';
+var started=false,playing=false,finished=false;
+var mode='synth',aud=null,ownLines=[];
+var actx=null,t0=0,sil=null;
+var world=null;
+var lastIdx=-99;
+var letter={m:'',f:''},recipient=false;
+var photos=[],photoGen=0;
+var recAud=null,recReady=false;
+var localPhotos=false,userVoice=false,userVoiceName='',userPhotoCount=0,recOffset=0;
+
+/* ---------- seeded world ---------- */
+function hashStr(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+var LCOL=[[255,184,107],[255,143,168],[255,212,136],[255,160,122],[255,200,150]];
+function buildWorld(seedStr){
+  var r=mulberry(hashStr(seedStr.toLowerCase()));
+  var w={stars:[],flies:[],lanterns:[],petals:[],rain:[]};
+  var i;
+  for(i=0;i<150;i++)w.stars.push({x:r(),y:r()*0.62,r:0.4+r()*1.2,ph:r()*6.28,sp:0.8+r()*2.2});
+  for(i=0;i<30;i++)w.flies.push({x:r(),y:0.45+r()*0.4,ph:r()*6.28,sp:0.3+r()*0.6,r:1.4+r()*1.6});
+  var shift=Math.floor(r()*LCOL.length);
+  [INTRO+LINE*4,INTRO+LINE*12].forEach(function(cs){
+    for(var k=0;k<17;k++)w.lanterns.push({x:0.06+r()*0.88,bt:cs+r()*9,sp:0.034+r()*0.04,sw:r()*6.28,size:0.017+r()*0.014,c:LCOL[(shift+Math.floor(r()*3))%LCOL.length]});
+  });
+  for(i=0;i<46;i++)w.petals.push({x:r(),ph:r()*1.2,sp:0.05+r()*0.06,sz:2.5+r()*3,rot:r()*6.28});
+  for(i=0;i<170;i++)w.rain.push({x:r(),ph:r(),sp:0.9+r()*0.6,len:10+r()*14});
+  w.moonX=0.58+r()*0.28;
+  return w;
+}
+
+/* ---------- sky palette over the song ---------- */
+var KF=[
+ [0,[9,12,38],[30,24,76]],
+ [0.25,[16,18,56],[70,40,110]],
+ [0.32,[40,24,84],[214,102,120]],
+ [0.48,[52,26,92],[236,130,118]],
+ [0.55,[22,30,66],[50,70,120]],
+ [0.70,[18,26,60],[58,62,118]],
+ [0.76,[46,24,88],[240,140,110]],
+ [0.94,[60,28,96],[255,170,120]],
+ [1,[8,10,32],[22,18,60]]
+];
+function mix3(a,b,u){return [lerp(a[0],b[0],u),lerp(a[1],b[1],u),lerp(a[2],b[2],u)]}
+function rgb(c){return 'rgb('+Math.round(c[0])+','+Math.round(c[1])+','+Math.round(c[2])+')'}
+function skyAt(p){
+  for(var i=0;i<KF.length-1;i++){
+    if(p>=KF[i][0]&&p<=KF[i+1][0]){
+      var u=ease((p-KF[i][0])/(KF[i+1][0]-KF[i][0]));
+      return [mix3(KF[i][1],KF[i+1][1],u),mix3(KF[i][2],KF[i+1][2],u)];
+    }
+  }
+  return [KF[KF.length-1][1],KF[KF.length-1][2]];
+}
+
+/* ---------- canvas ---------- */
+var cv=$('#cv'),g=cv.getContext('2d'),dpr=1;
+function resize(){
+  dpr=Math.min(2,window.devicePixelRatio||1);
+  var w=cv.clientWidth,h=cv.clientHeight;
+  if(!w||!h)return;
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+}
+if(window.ResizeObserver){new ResizeObserver(resize).observe(cv)}else{window.addEventListener('resize',resize)}
+resize();
+
+function heart(cx,cy,s){
+  g.beginPath();g.moveTo(cx,cy+s*0.9);
+  g.bezierCurveTo(cx-s*1.6,cy-s*0.2,cx-s*0.9,cy-s*1.3,cx,cy-s*0.45);
+  g.bezierCurveTo(cx+s*0.9,cy-s*1.3,cx+s*1.6,cy-s*0.2,cx,cy+s*0.9);
+  g.fill();
+}
+
+function person(x,y,h,o){
+  g.save();g.translate(x,y-o.bob);g.rotate(o.lean);
+  g.fillStyle=o.col;g.strokeStyle=o.col;g.lineCap='round';g.lineJoin='round';
+  var sw=o.sw,s=o.side;
+  g.lineWidth=h*0.055;
+  g.beginPath();
+  g.moveTo(-h*0.04,-h*0.42);g.lineTo(-h*0.04+Math.sin(sw)*h*0.09,0);
+  g.moveTo(h*0.04,-h*0.42);g.lineTo(h*0.04-Math.sin(sw)*h*0.09,0);
+  g.stroke();
+  var hem=o.dress?0.17:0.09,hemY=o.dress?0.24:0.4;
+  g.beginPath();
+  g.moveTo(-h*0.1,-h*0.76);
+  g.quadraticCurveTo(-h*0.12,-h*0.58,-h*hem,-h*hemY);
+  g.lineTo(h*hem,-h*hemY);
+  g.quadraticCurveTo(h*0.12,-h*0.58,h*0.1,-h*0.76);
+  g.closePath();g.fill();
+  if(o.dress){g.beginPath();g.ellipse(0,-h*0.83,h*0.088,h*0.105,0,0,Math.PI*2);g.fill()}
+  g.beginPath();g.arc(0,-h*0.86,h*0.075,0,Math.PI*2);g.fill();
+  g.lineWidth=h*0.045;
+  g.beginPath();
+  g.moveTo(s*h*0.09,-h*0.72);
+  if(o.hand!==null)g.lineTo(s*o.hand,-h*0.46);else g.lineTo(s*(h*0.12+Math.sin(sw)*h*0.05),-h*0.45);
+  g.moveTo(-s*h*0.09,-h*0.72);
+  g.lineTo(-s*(h*0.11+Math.sin(sw)*h*0.04),-h*0.45);
+  g.stroke();
+  g.restore();
+}
+
+function draw(clock,t){
+  var W=cv.clientWidth,H=cv.clientHeight;
+  if(!W||!H||!cv.width)return;
+  var p=Math.min(1,t/D);
+  g.setTransform(dpr,0,0,dpr,0,0);
+  var sk=skyAt(p),top=sk[0],bot=sk[1];
+  var warm=clamp((bot[0]-40)/200,0,1);
+  var gr=g.createLinearGradient(0,0,0,H*0.85);
+  gr.addColorStop(0,rgb(top));gr.addColorStop(1,rgb(bot));
+  g.fillStyle=gr;g.fillRect(0,0,W,H);
+
+  var i,s,a;
+  for(i=0;i<world.stars.length;i++){
+    s=world.stars[i];
+    a=(0.35+0.65*(0.5+0.5*Math.sin(clock*s.sp+s.ph)))*(1-warm*0.8);
+    g.fillStyle='rgba(255,246,225,'+a.toFixed(3)+')';
+    g.beginPath();g.arc(s.x*W,s.y*H,s.r,0,6.283);g.fill();
+  }
+
+  var mp=ease(clamp((p-0.02)/0.26,0,1));
+  var mx=world.moonX*W,my=H*(0.53-0.33*mp),mr=Math.min(W,H)*0.07;
+  var mg=g.createRadialGradient(mx,my,mr*0.4,mx,my,mr*4.2);
+  mg.addColorStop(0,'rgba(255,236,200,'+(0.38-warm*0.14).toFixed(3)+')');mg.addColorStop(1,'rgba(255,236,200,0)');
+  g.fillStyle=mg;g.fillRect(mx-mr*4.2,my-mr*4.2,mr*8.4,mr*8.4);
+  var mb=g.createRadialGradient(mx-mr*0.3,my-mr*0.3,mr*0.1,mx,my,mr);
+  mb.addColorStop(0,'#fff8e6');mb.addColorStop(1,'#f3dcae');
+  g.fillStyle=mb;g.beginPath();g.arc(mx,my,mr,0,6.283);g.fill();
+
+  /* hills */
+  var farC=mix3([26,22,70],[116,54,100],warm*0.75);
+  g.fillStyle=rgb(farC);g.beginPath();g.moveTo(0,H);
+  for(var x=0;x<=W+8;x+=8){g.lineTo(x,H*0.69-Math.sin(x/W*5.2+1.3)*H*0.035-Math.sin(x/W*2.1)*H*0.03)}
+  g.lineTo(W,H);g.closePath();g.fill();
+  var gy=function(x){return H*0.8-Math.sin(x/W*Math.PI)*H*0.035};
+  var nearC=mix3([9,10,30],[42,18,50],warm*0.7);
+  g.fillStyle=rgb(nearC);g.beginPath();g.moveTo(0,H);
+  for(var x2=0;x2<=W+8;x2+=8){g.lineTo(x2,gy(Math.min(x2,W)))}
+  g.lineTo(W,H);g.closePath();g.fill();
+
+  var rainAmt=smooth(p,0.47,0.52)*(1-smooth(p,0.70,0.745));
+  var chorus=Math.max(smooth(p,0.27,0.29)*(1-smooth(p,0.49,0.51)),smooth(p,0.715,0.735)*(1-smooth(p,0.935,0.955)));
+
+  /* fireflies */
+  for(i=0;i<world.flies.length;i++){
+    s=world.flies[i];
+    var fx=(s.x+Math.sin(clock*s.sp+s.ph)*0.03)*W,fy=(s.y+Math.cos(clock*s.sp*0.8+s.ph)*0.025)*H;
+    a=(0.25+0.75*(0.5+0.5*Math.sin(clock*1.7+s.ph*3)))*(1-rainAmt*0.7);
+    var fg=g.createRadialGradient(fx,fy,0,fx,fy,s.r*5);
+    fg.addColorStop(0,'rgba(255,230,150,'+(a*0.9).toFixed(3)+')');fg.addColorStop(1,'rgba(255,230,150,0)');
+    g.fillStyle=fg;g.fillRect(fx-s.r*5,fy-s.r*5,s.r*10,s.r*10);
+  }
+
+  /* lanterns */
+  for(i=0;i<world.lanterns.length;i++){
+    var l=world.lanterns[i],age=t-l.bt;
+    if(age<0||!started)continue;
+    var ly=0.97-age*l.sp;
+    if(ly<-0.1)continue;
+    var fade=clamp(age/1.5,0,1)*clamp((ly+0.1)/0.2,0,1);
+    var sx=l.x*W+Math.sin(clock*0.7+l.sw)*W*0.012,sy=ly*H,z=l.size*Math.min(W,H)*1.6;
+    var c=l.c;
+    var lg=g.createRadialGradient(sx,sy,0,sx,sy,z*3);
+    lg.addColorStop(0,'rgba('+c[0]+','+c[1]+','+c[2]+','+(0.45*fade).toFixed(3)+')');lg.addColorStop(1,'rgba('+c[0]+','+c[1]+','+c[2]+',0)');
+    g.fillStyle=lg;g.fillRect(sx-z*3,sy-z*3,z*6,z*6);
+    var bg=g.createLinearGradient(0,sy-z*0.7,0,sy+z*0.7);
+    bg.addColorStop(0,'rgba(255,244,214,'+fade.toFixed(3)+')');bg.addColorStop(1,'rgba('+c[0]+','+c[1]+','+c[2]+','+fade.toFixed(3)+')');
+    g.fillStyle=bg;g.beginPath();
+    g.moveTo(sx-0.35*z,sy-0.7*z);g.lineTo(sx+0.35*z,sy-0.7*z);
+    g.quadraticCurveTo(sx+0.62*z,sy,sx+0.28*z,sy+0.7*z);g.lineTo(sx-0.28*z,sy+0.7*z);
+    g.quadraticCurveTo(sx-0.62*z,sy,sx-0.35*z,sy-0.7*z);g.fill();
+  }
+
+  /* petals */
+  if(chorus>0.01){
+    for(i=0;i<world.petals.length;i++){
+      s=world.petals[i];
+      var py=((clock*s.sp+s.ph)%1.2)-0.1;
+      var px=(s.x+Math.sin(clock*0.7+s.ph*9)*0.04+py*0.08);
+      g.fillStyle='rgba(255,170,190,'+(0.7*chorus).toFixed(3)+')';
+      g.beginPath();g.ellipse(px*W,py*H,s.sz*1.5,s.sz*0.8,s.rot+clock*0.8,0,6.283);g.fill();
+    }
+  }
+
+  drawPhotos(W,H,t,clock);
+
+  /* the two of them */
+  var sm=started?ease(clamp((t-8)/50,0,1)):0;
+  var h=Math.min(H*0.21,W*0.24),gap=h*0.58,xc=W*0.5;
+  var xA=lerp(W*0.14,xc-gap/2,sm),xB=lerp(W*0.86,xc+gap/2,sm);
+  var joined=sm>=1,moving=started&&t>8&&!joined&&playing;
+  var phase=moving?clock*5:0;
+  var bob=moving?Math.abs(Math.sin(clock*5))*h*0.015:0;
+  var lean=joined?0.06*smooth(t,72,100):0;
+  var figC=rgb(mix3([10,10,30],[34,14,42],warm));
+  if(sm>0){
+    var gg=g.createRadialGradient(xc,gy(xc)-h*0.5,0,xc,gy(xc)-h*0.5,h*2.4);
+    gg.addColorStop(0,'rgba(255,170,130,'+(0.28*sm*(0.35+chorus)).toFixed(3)+')');gg.addColorStop(1,'rgba(255,170,130,0)');
+    g.fillStyle=gg;g.fillRect(xc-h*2.4,gy(xc)-h*2.9,h*4.8,h*4.8);
+  }
+  person(xA,gy(xA),h,{col:figC,sw:phase,side:1,dress:false,lean:lean,bob:bob,hand:joined?gap/2:null});
+  person(xB,gy(xB),h*0.93,{col:figC,sw:phase+1.6,side:-1,dress:true,lean:-lean,bob:bob,hand:joined?gap/2/0.93:null});
+  if(joined){
+    var ha=smooth(t,60,64)*(1-smooth(p,0.95,0.99));
+    var pulse=1+0.08*Math.sin(clock*3);
+    g.fillStyle='rgba(255,130,160,'+(0.9*ha).toFixed(3)+')';
+    heart(xc,gy(xc)-h*1.32,h*0.1*pulse);
+  }
+
+  /* rain */
+  if(rainAmt>0.01){
+    g.strokeStyle='rgba(190,210,255,'+(0.38*rainAmt).toFixed(3)+')';g.lineWidth=1;g.beginPath();
+    for(i=0;i<world.rain.length;i++){
+      s=world.rain[i];
+      var ry=(((clock*s.sp+s.ph)%1.1)-0.05)*H,rx=s.x*W+ry*0.12;
+      g.moveTo(rx,ry);g.lineTo(rx-3,ry+s.len);
+    }
+    g.stroke();
+  }
+
+  var fo=smooth(p,0.955,1);
+  if(fo>0){g.fillStyle='rgba(6,7,24,'+(0.55*fo).toFixed(3)+')';g.fillRect(0,0,W,H)}
+}
+
+/* ---------- photos during the choruses ---------- */
+function drawPhotos(W,H,t,clock){
+  if(!started)return;
+  var ph=photos.filter(Boolean);
+  if(!ph.length)return;
+  var L=LINE*4,starts=[INTRO+LINE*4,INTRO+LINE*12];
+  for(var c=0;c<starts.length;c++){
+    var cs=starts[c];
+    if(t<cs||t>=cs+L)continue;
+    var slot=Math.max(3.6,L/ph.length);
+    var idx=Math.floor((t-cs)/slot)%ph.length;
+    var lt=(t-cs)%slot;
+    var a=Math.min(1,lt/0.8,(slot-lt)/0.8);
+    if(a<=0)return;
+    var im=ph[idx];
+    if(!im||!im.width)return;
+    var wide=W/H>1.2;
+    var bw=wide?Math.min(W*0.26,H*0.42):W*0.5,bh=bw*1.22;
+    var cx=wide?W*0.22:W*0.5,cy=wide?H*0.38:H*0.3;
+    var rot=(idx%2?1:-1)*0.05,z=1+0.03*(lt/slot);
+    var pad=bw*0.06,iw=bw-pad*2,ih=iw;
+    g.save();
+    g.globalAlpha=a;
+    g.translate(cx,cy+(1-a)*8);
+    g.rotate(rot);
+    g.shadowColor='rgba(0,0,0,0.45)';g.shadowBlur=bw*0.1;g.shadowOffsetY=bw*0.03;
+    g.fillStyle='#fbf5ee';g.fillRect(-bw/2,-bh/2,bw,bh);
+    g.shadowColor='rgba(0,0,0,0)';g.shadowBlur=0;g.shadowOffsetY=0;
+    g.beginPath();g.rect(-iw/2,-bh/2+pad,iw,ih);g.clip();
+    var sc=Math.max(iw/im.width,ih/im.height)*z;
+    var dw=im.width*sc,dh=im.height*sc;
+    g.drawImage(im,-dw/2,-bh/2+pad+ih/2-dh/2,dw,dh);
+    g.restore();
+    return;
+  }
+}
+
+/* ---------- synthesized tune ---------- */
+function schedule(c,start){
+  var master=c.createGain();master.gain.value=0.8;
+  var comp=c.createDynamicsCompressor();master.connect(comp);comp.connect(c.destination);
+  var dly=c.createDelay(1);dly.delayTime.value=BEAT*0.75;
+  var fb=c.createGain();fb.gain.value=0.32;var wet=c.createGain();wet.gain.value=0.28;
+  dly.connect(fb);fb.connect(dly);dly.connect(wet);wet.connect(master);
+  var send=c.createGain();send.gain.value=1;send.connect(dly);
+
+  [[73.42,0.035],[110,0.022],[146.83,0.014]].forEach(function(d){
+    var o=c.createOscillator();o.type='triangle';o.frequency.value=d[0];
+    var gn=c.createGain();gn.gain.setValueAtTime(0,start);gn.gain.linearRampToValueAtTime(d[1],start+3);
+    gn.gain.setValueAtTime(d[1],start+D-4);gn.gain.linearRampToValueAtTime(0,start+D);
+    o.connect(gn);gn.connect(master);o.start(start);o.stop(start+D+0.1);
+  });
+
+  function note(f,tm,durBeats,gain,type,cut){
+    var o=c.createOscillator();o.type=type;o.frequency.value=f;
+    var flt=c.createBiquadFilter();flt.type='lowpass';
+    flt.frequency.setValueAtTime(cut,tm);
+    flt.frequency.exponentialRampToValueAtTime(500,tm+Math.max(0.4,durBeats*BEAT));
+    var gn=c.createGain();gn.gain.setValueAtTime(0.0001,tm);
+    gn.gain.exponentialRampToValueAtTime(gain,tm+0.012);
+    gn.gain.exponentialRampToValueAtTime(0.0001,tm+durBeats*BEAT+0.5);
+    o.connect(flt);flt.connect(gn);gn.connect(master);gn.connect(send);
+    o.start(tm);o.stop(tm+durBeats*BEAT+0.6);
+  }
+  function pad(f,tm,dur){
+    var o=c.createOscillator();o.type='triangle';o.frequency.value=f;
+    var flt=c.createBiquadFilter();flt.type='lowpass';flt.frequency.value=1400;
+    var gn=c.createGain();gn.gain.setValueAtTime(0,tm);gn.gain.linearRampToValueAtTime(0.03,tm+0.6);
+    gn.gain.setValueAtTime(0.03,tm+dur-0.8);gn.gain.linearRampToValueAtTime(0,tm+dur+0.4);
+    o.connect(flt);flt.connect(gn);gn.connect(master);o.start(tm);o.stop(tm+dur+0.5);
+  }
+  var ROOTS=[146.83,123.47,98.0,110.0];
+  var QUAL=[[0,4,7],[0,3,7],[0,4,7],[0,4,7]];
+  var bars=Math.round(D/BAR);
+  for(var k=0;k<bars;k++){
+    var tb=start+k*BAR;
+    var ci=k%4;
+    if(k===bars-2)ci=3;
+    if(k===bars-1)ci=0;
+    QUAL[ci].forEach(function(n,ix){pad(ROOTS[ci]*2*Math.pow(2,n/12),tb,BAR)});
+    note(ROOTS[ci]/2,tb,2.5,0.16,'sine',900);
+    note(ROOTS[ci]/2,tb+BEAT*2,1.8,0.1,'sine',900);
+    for(var e=0;e<8;e++){
+      var seq=[0,1,2,1,0,1,2,1];
+      var n2=QUAL[ci][seq[e]];
+      note(ROOTS[ci]*4*Math.pow(2,n2/12),tb+e*BEAT*0.5,0.9,0.028,'triangle',2400);
+    }
+  }
+  var V=[
+   [[0,7,1],[1,9,1],[2,12,2],[4,11,1],[5,9,1],[6,7,2]],
+   [[0,7,1],[1,9,1],[2,11,2],[4,9,1],[5,7,1],[6,4,2]],
+   [[0,4,1],[1,7,1],[2,9,2],[4,7,1],[5,9,1],[6,11,2]],
+   [[0,12,1.5],[1.5,11,0.5],[2,9,1],[3,7,1],[4,9,2],[6,4,1],[7,0,1]]
+  ];
+  var C=[
+   [[0,12,1.5],[1.5,14,0.5],[2,16,2],[4,14,1],[5,12,1],[6,11,2]],
+   [[0,12,1.5],[1.5,14,0.5],[2,16,1],[3,17,1],[4,16,2],[6,14,2]],
+   [[0,16,1],[1,14,1],[2,12,2],[4,14,1],[5,12,1],[6,11,2]],
+   [[0,12,1],[1,11,1],[2,9,2],[4,7,1],[5,4,1],[6,2,1],[7,0,1]]
+  ];
+  for(var li=0;li<16;li++){
+    var pat=(ORDER[Math.floor(li/4)]===1?C:V)[li%4];
+    var ls=start+INTRO+li*LINE;
+    pat.forEach(function(nn){
+      note(293.66*Math.pow(2,nn[1]/12),ls+nn[0]*BEAT,nn[2],ORDER[Math.floor(li/4)]===1?0.085:0.07,'sawtooth',3200);
+    });
+  }
+  note(293.66*2,start+D-BAR,3.4,0.08,'sawtooth',3000);
+  note(293.66,start+D-BAR,3.4,0.06,'sawtooth',2400);
+}
+
+/* ---------- lyrics ---------- */
+function fmt(s){s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function sub(s){return s.replace(/\{n\}/g,playName)}
+function setLyric(i){
+  var secEl=$('#sec'),hi=$('#hi'),tr=$('#tr'),en=$('#en');
+  document.querySelectorAll('.ln.now').forEach(function(e){e.classList.remove('now')});
+  if(i<0){
+    secEl.textContent='';
+    hi.textContent=started?'♪':'शुरू करने के लिए प्ले दबाइए';
+    tr.textContent=started?'':'Shuru karne ke liye play dabaiye';
+    en.textContent=started?'The tune begins':'Press Play to begin.';
+    return;
+  }
+  if(mode==='own'){
+    secEl.textContent='';tr.textContent='';en.textContent='';
+    hi.textContent=ownLines[i]||'';
+    return;
+  }
+  var si=ORDER[Math.floor(i/4)],li=i%4,ln=SONG[si].lines[li];
+  secEl.textContent=SONG[si].label;
+  hi.replaceChildren();
+  sub(ln[0]).split(' ').forEach(function(w,k){
+    var sp=document.createElement('span');sp.className='w';sp.style.animationDelay=(k*0.11)+'s';sp.textContent=w+' ';hi.appendChild(sp);
+  });
+  tr.textContent=sub(ln[1]);en.textContent=sub(ln[2]);
+  var row=document.getElementById('r-'+si+'-'+li);
+  if(row)row.classList.add('now');
+}
+function renderWords(){
+  var host=$('#blocks');host.replaceChildren();
+  var n=nm();
+  SONG.forEach(function(sec,si){
+    var b=document.createElement('div');b.className='blk';
+    var h=document.createElement('h3');h.textContent=sec.label;
+    var sp=document.createElement('span');sp.textContent=sec.gloss;h.appendChild(sp);b.appendChild(h);
+    sec.lines.forEach(function(ln,li){
+      var d=document.createElement('div');d.className='ln';d.id='r-'+si+'-'+li;
+      ['h','t','e'].forEach(function(cls,ix){
+        var x=document.createElement('div');x.className=cls;x.textContent=ln[ix].replace(/\{n\}/g,n);d.appendChild(x);
+      });
+      b.appendChild(d);
+    });
+    host.appendChild(b);
+  });
+  $('#for').textContent=(nameIn.value.trim()?'A song for '+n+', ':'An original Hindi love song, ')+'2 minutes';
+  renderCue();
+}
+
+/* ---------- playback ---------- */
+function now(){
+  var A=activeAud();
+  if(A&&mode==='rec')return clamp(A.currentTime-0.2-recOffset,0,D);
+  if(A&&A.duration>0)return clamp(A.currentTime/A.duration,0,1)*D;
+  if(actx)return Math.max(0,actx.currentTime-t0);
+  if(sil)return Math.max(0,sil.paused?sil.pt:performance.now()/1000-sil.t0);
+  return 0;
+}
+function stopAll(){
+  if(actx){try{actx.close()}catch(e){}actx=null}
+  if(aud){try{aud.pause()}catch(e){}}
+  if(recAud){try{recAud.pause()}catch(e){}}
+  sil=null;
+}
+function setPlayLabel(){$('#playbtn').textContent=!started||finished?(finished?'Watch again':'Play'):(playing?'Pause':'Resume')}
+function startFilm(){
+  stopAll();
+  playName=nm();
+  world=buildWorld(playName);
+  finished=false;lastIdx=-99;
+  $('#intro').hidden=true;$('#end').hidden=true;
+  ownLines=$('#own-lyrics').value.split('\n').map(function(s){return s.trim()}).filter(Boolean);
+  var ownOk=mode==='own'&&aud;
+  if(!ownOk)mode=(recAud&&recReady)?'rec':'synth';
+  var A=activeAud();
+  if(A){
+    try{A.currentTime=0}catch(e){}
+    var pr=A.play();if(pr&&pr.catch)pr.catch(function(){$('#own-status').textContent='The browser blocked playback. Press Resume to try again.';playing=false;setPlayLabel()});
+  }else{
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext;
+      actx=new AC();t0=actx.currentTime+0.2;schedule(actx,t0);
+    }catch(e){
+      actx=null;sil={t0:performance.now()/1000+0.2,paused:false,pt:0};
+    }
+  }
+  started=true;playing=true;
+  renderWords();
+  setLyric(-1);
+  setPlayLabel();
+}
+function pauseResume(){
+  if(!started){$('#f').requestSubmit?$('#f').requestSubmit():startFilm();return}
+  if(finished){startFilm();return}
+  if(playing){
+    var A=activeAud();
+    if(A)A.pause();
+    else if(actx)actx.suspend();
+    else if(sil){sil.pt=now();sil.paused=true}
+    playing=false;
+  }else{
+    var A2=activeAud();
+    if(A2){var q=A2.play();if(q&&q.catch)q.catch(function(){})}
+    else if(actx)actx.resume();
+    else if(sil){sil.t0=performance.now()/1000-sil.pt;sil.paused=false}
+    playing=true;
+  }
+  setPlayLabel();
+}
+function finish(){
+  finished=true;playing=false;
+  stopAll();
+  var n=playName;
+  $('#endhi').textContent='ये शाम '+n+' के नाम';
+  $('#endtr').textContent='Ye shaam '+n+' ke naam';
+  var lt=$('#letter');
+  if(letter.m){
+    $('#lettertx').textContent=letter.m;
+    $('#letterfrom').textContent=letter.f?'\u2014 '+letter.f:'';
+    lt.hidden=false;$('#endtx').hidden=true;
+  }else{lt.hidden=true;$('#endtx').hidden=false}
+  $('#end').hidden=false;
+  setPlayLabel();
+}
+function changeName(){
+  if(!recipient)letter={m:'',f:''};
+  stopAll();started=false;playing=false;finished=false;lastIdx=-99;
+  $('#end').hidden=true;$('#intro').hidden=false;
+  $('#prog').style.width='0';$('#clock').textContent='0:00 / '+fmt(D);
+  setLyric(-1);setPlayLabel();
+  try{nameIn.focus()}catch(e){}
+}
+function lineIndexAt(t){
+  if(mode==='own'){var n=ownLines.length;if(!n)return -1;return Math.min(n-1,Math.floor(t/D*n))}
+  if(t<INTRO)return -1;
+  var i=Math.floor((t-INTRO)/LINE);
+  return i>15?-2:i;
+}
+function frame(ms){
+  var clock=ms/1000,t=0;
+  if(started&&!finished)t=now();else if(finished)t=D;
+  if(world)draw(clock,t);
+  if(started&&!finished){
+    var A=activeAud();
+    var total=(A&&A.duration>0)?A.duration:D;
+    var cur=(A&&A.duration>0)?A.currentTime:t;
+    $('#prog').style.width=(clamp(cur/total,0,1)*100).toFixed(2)+'%';
+    $('#clock').textContent=fmt(cur)+' / '+fmt(total);
+    var idx=lineIndexAt(t);
+    if(idx!==-2&&idx!==lastIdx){lastIdx=idx;setLyric(idx)}
+    if((mode==='synth'||mode==='rec')&&t>=D-0.02)finish();
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- wiring ---------- */
+$('#f').addEventListener('submit',function(e){e.preventDefault();startFilm()});
+$('#playbtn').addEventListener('click',pauseResume);
+$('#again1').addEventListener('click',startFilm);
+$('#chg1').addEventListener('click',function(){
+  if(recipient){var c=$('#creator');if(c&&c.scrollIntoView)c.scrollIntoView({behavior:'smooth'})}
+  else changeName();
+});
+$('#chg2').addEventListener('click',changeName);
+nameIn.addEventListener('input',function(){if(!started)renderWords()});
+
+$('#audio-file').addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0];
+  if(!f)return;
+  if(aud){try{aud.pause();URL.revokeObjectURL(aud.src)}catch(_){}}
+  var st=$('#own-status');
+  aud=new Audio();aud.preload='auto';
+  aud.addEventListener('ended',function(){if(started&&mode==='own')finish()});
+  aud.addEventListener('error',function(){st.textContent='This browser could not play that file. Try an MP3 or M4A.';mode='synth';aud=null});
+  aud.addEventListener('loadedmetadata',function(){st.textContent='Ready: '+f.name+' ('+fmt(aud.duration)+'). Press Play on the film.'});
+  try{aud.src=URL.createObjectURL(f);mode='own';st.textContent='Loading '+f.name+'...'}
+  catch(err){st.textContent='This browser could not open that file.';mode='synth';aud=null}
+});
+$('#own-reset').addEventListener('click',function(){
+  if(aud){try{aud.pause()}catch(_){}}
+  aud=null;mode='synth';$('#audio-file').value='';$('#own-status').textContent='Using the original tune.';
+});
+
+function sanitizeSet(s){return String(s||'').toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,30)}
+function loadPhotos(set){
+  var gen=++photoGen;
+  photos=[];
+  var base='photos/'+(set?set+'/':'');
+  var exts=['jpg','jpeg','png','webp'];
+  function tryIdx(i){
+    if(i>8||gen!==photoGen)return;
+    var e=0;
+    (function tryExt(){
+      if(e>=exts.length||gen!==photoGen)return;
+      var im=new Image();
+      im.onload=function(){if(gen===photoGen){photos.push(shrink(im));tryIdx(i+1)}};
+      im.onerror=function(){e++;tryExt()};
+      im.src=base+i+'.'+exts[e];
+    })();
+  }
+  tryIdx(1);
+}
+function shrink(im){
+  var w=im.naturalWidth||im.width,h=im.naturalHeight||im.height,m=1400,sc=Math.min(1,m/Math.max(w,h));
+  if(sc>=1)return im;
+  var c=document.createElement('canvas');
+  c.width=Math.round(w*sc);c.height=Math.round(h*sc);
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  return c;
+}
+function useLocalPhotos(files){
+  photoGen++;
+  photos=[];
+  var list=Array.prototype.slice.call(files,0,8);
+  localPhotos=list.length>0;userPhotoCount=list.length;
+  list.forEach(function(f,k){
+    var im=new Image();
+    im.onload=function(){photos[k]=shrink(im)};
+    im.src=URL.createObjectURL(f);
+  });
+}
+
+/* ---------- recorded voice (song/song.mp3) and backing track ---------- */
+function activeAud(){return mode==='own'?(aud||null):(mode==='rec'?recAud:null)}
+function probeRecorded(){
+  var names=['song/song.mp3','song/song.m4a','song/song.ogg','song/song.wav'],k=0;
+  (function next(){
+    if(k>=names.length)return;
+    var a=new Audio();
+    a.preload='metadata';
+    a.addEventListener('loadedmetadata',function(){
+      if(!(a.duration>10)||userVoice)return;
+      recAud=a;recReady=true;
+      a.addEventListener('ended',function(){if(started&&mode==='rec')finish()});
+    });
+    a.addEventListener('error',function(){k++;next()});
+    a.src=names[k];
+  })();
+}
+function renderCue(){
+  var host=$('#cue');if(!host)return;
+  host.replaceChildren();
+  var n=nm();
+  for(var i=0;i<16;i++){
+    var si=ORDER[Math.floor(i/4)],ln=SONG[si].lines[i%4];
+    var row=document.createElement('div');row.className='cuerow';
+    var a=document.createElement('span');a.className='cuet';a.textContent=fmt(INTRO+i*LINE);
+    var b=document.createElement('span');b.textContent=ln[0].replace(/\{n\}/g,n)+' · '+ln[1].replace(/\{n\}/g,n);
+    row.appendChild(a);row.appendChild(b);host.appendChild(row);
+  }
+}
+function wavBlob(buf){
+  var ch=buf.getChannelData(0),n=ch.length,sr=buf.sampleRate;
+  var ab=new ArrayBuffer(44+n*2),v=new DataView(ab);
+  function ws(o,str){for(var i=0;i<str.length;i++)v.setUint8(o+i,str.charCodeAt(i))}
+  ws(0,'RIFF');v.setUint32(4,36+n*2,true);ws(8,'WAVE');ws(12,'fmt ');
+  v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);
+  ws(36,'data');v.setUint32(40,n*2,true);
+  for(var i=0;i<n;i++){var x=Math.max(-1,Math.min(1,ch[i]));v.setInt16(44+i*2,x<0?x*0x8000:x*0x7fff,true)}
+  return new Blob([ab],{type:'audio/wav'});
+}
+$('#bt-make').addEventListener('click',function(){
+  var st=$('#bt-status'),dl=$('#bt-dl');
+  var AC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+  if(!AC){st.textContent='This browser cannot make the track. Try Chrome on a computer or phone.';return}
+  st.textContent='Making the backing track. This takes a few seconds...';
+  dl.hidden=true;
+  setTimeout(function(){
+    try{
+      var oc=new AC(1,Math.ceil(44100*(D+0.8)),44100);
+      schedule(oc,0.2);
+      oc.startRendering().then(function(buf){
+        var url=URL.createObjectURL(wavBlob(buf));
+        dl.href=url;dl.download='ek-shaam-backing-track.wav';dl.hidden=false;
+        st.textContent='Ready. About 10 MB, two minutes long.';
+      }).catch(function(){st.textContent='Could not make the track in this browser.'});
+    }catch(e){st.textContent='Could not make the track in this browser.'}
+  },50);
+});
+
+/* ---------- files picked on this device (kept in IndexedDB) ---------- */
+var DB=null;
+function dbOpen(cb){
+  try{
+    var r=indexedDB.open('ek-shaam',1);
+    r.onupgradeneeded=function(){r.result.createObjectStore('f')};
+    r.onsuccess=function(){DB=r.result;cb(DB)};
+    r.onerror=function(){cb(null)};
+  }catch(e){cb(null)}
+}
+function dbPut(k,v){if(!DB)return;try{DB.transaction('f','readwrite').objectStore('f').put(v,k)}catch(e){}}
+function dbDel(k){if(!DB)return;try{DB.transaction('f','readwrite').objectStore('f').delete(k)}catch(e){}}
+function dbGet(k,cb){
+  if(!DB){cb(undefined);return}
+  try{var q=DB.transaction('f').objectStore('f').get(k);q.onsuccess=function(){cb(q.result)};q.onerror=function(){cb(undefined)}}
+  catch(e){cb(undefined)}
+}
+function fmtNudge(v){return (v>0?'+':'')+v.toFixed(1)+' s'}
+function updateUserStatus(){
+  $('#u-pstatus').textContent=userPhotoCount?(userPhotoCount+' photo'+(userPhotoCount>1?'s':'')+' saved on this device.'):'No photos added.';
+  $('#u-vstatus').textContent=userVoice?('Using your recording'+(userVoiceName?': '+userVoiceName:'')+'.'):'No recording added. The instrumental tune plays.';
+}
+function setUserVoice(f,fromStore){
+  var a=new Audio();a.preload='metadata';
+  a.addEventListener('loadedmetadata',function(){
+    if(recAud&&recAud!==a){try{recAud.pause()}catch(e){}}
+    recAud=a;recReady=true;userVoice=true;userVoiceName=f.name||'';
+    a.addEventListener('ended',function(){if(started&&mode==='rec')finish()});
+    if(!fromStore)dbPut('voice',f);
+    updateUserStatus();
+  });
+  a.addEventListener('error',function(){$('#u-vstatus').textContent='This browser could not play that file. Try an MP3 or M4A.'});
+  a.src=URL.createObjectURL(f);
+}
+function restoreUser(db){
+  if(!db)return;
+  dbGet('photos',function(arr){if(arr&&arr.length){useLocalPhotos(arr);updateUserStatus()}});
+  dbGet('voice',function(f){if(f)setUserVoice(f,true)});
+  dbGet('nudge',function(v){
+    if(typeof v==='number'){recOffset=v;$('#u-nudge').value=v;$('#u-nval').textContent=fmtNudge(v)}
+  });
+}
+$('#u-photos').addEventListener('change',function(e){
+  var fl=Array.prototype.slice.call(e.target.files||[],0,8);
+  if(!fl.length)return;
+  useLocalPhotos(fl);dbPut('photos',fl);updateUserStatus();
+});
+$('#u-voice').addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0];
+  if(f)setUserVoice(f,false);
+});
+$('#u-nudge').addEventListener('input',function(){
+  recOffset=parseFloat(this.value)||0;
+  $('#u-nval').textContent=fmtNudge(recOffset);
+  dbPut('nudge',recOffset);
+});
+$('#u-go').addEventListener('click',function(){
+  if(!nameIn.value.trim()&&$('#c-name').value.trim())nameIn.value=$('#c-name').value.trim();
+  try{window.scrollTo({top:0,behavior:'smooth'})}catch(e){window.scrollTo(0,0)}
+  startFilm();
+});
+$('#u-clear').addEventListener('click',function(){
+  dbDel('photos');dbDel('voice');dbDel('nudge');
+  photoGen++;photos=[];localPhotos=false;userPhotoCount=0;
+  if(recAud){try{recAud.pause()}catch(e){}}
+  recAud=null;recReady=false;userVoice=false;userVoiceName='';recOffset=0;
+  $('#u-nudge').value=0;$('#u-nval').textContent=fmtNudge(0);
+  $('#u-photos').value='';$('#u-voice').value='';
+  loadPhotos(photoSet);probeRecorded();updateUserStatus();
+});
+
+/* ---------- links: ?d=<packed name+message> , ?to=Name , or #Name ---------- */
+function b64e(o){
+  var b=new TextEncoder().encode(JSON.stringify(o)),s='';
+  b.forEach(function(x){s+=String.fromCharCode(x)});
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64d(s){
+  s=s.replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length%4)s+='=';
+  var bin=atob(s),a=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(a));
+}
+function baseUrl(){return location.href.split(/[?#]/)[0]}
+function makeLink(){
+  var to=$('#c-name').value.trim().slice(0,24),fr=$('#c-from').value.trim().slice(0,24),m=$('#c-msg').value.trim().slice(0,300),st=sanitizeSet($('#c-set').value);
+  if(!to&&!fr&&!m&&!st)return baseUrl();
+  if(!fr&&!m)return baseUrl()+'?'+(to?'to='+encodeURIComponent(to):'')+(to&&st?'&':'')+(st?'s='+st:'');
+  return baseUrl()+'?d='+b64e({t:to,f:fr,m:m,s:st});
+}
+function refreshLink(){
+  var l=makeLink();
+  $('#c-link').value=l;
+  $('#c-count').textContent=$('#c-msg').value.length+' / 300';
+  $('#c-wa').href='https://wa.me/?text='+encodeURIComponent('I made a song for you: '+l);
+}
+['#c-name','#c-from','#c-msg','#c-set'].forEach(function(sel){$(sel).addEventListener('input',refreshLink)});
+$('#c-copy').addEventListener('click',function(){
+  var el=$('#c-link'),st=$('#c-status');
+  refreshLink();el.focus();el.select();
+  var ok=function(){st.textContent='Link copied. Paste it into WhatsApp, Messenger or anywhere.'};
+  var no=function(){st.textContent='Press and hold the link above, then choose Copy.'};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(el.value).then(ok,no)}
+  else{try{document.execCommand('copy')?ok():no()}catch(e){no()}}
+});
+$('#c-try').addEventListener('click',function(){
+  nameIn.value=$('#c-name').value.trim().slice(0,24);
+  letter={m:$('#c-msg').value.trim().slice(0,300),f:$('#c-from').value.trim().slice(0,24)};
+  if(!localPhotos)loadPhotos(sanitizeSet($('#c-set').value));
+  try{window.scrollTo({top:0,behavior:'smooth'})}catch(e){window.scrollTo(0,0)}
+  startFilm();
+});
+var photoSet='';
+try{
+  var qs=new URLSearchParams(location.search),to=qs.get('to'),dd=qs.get('d');
+  photoSet=sanitizeSet(qs.get('s'));
+  if(dd){
+    var o=b64d(dd);
+    if(o&&typeof o==='object'){
+      to=String(o.t||'');
+      letter={m:String(o.m||'').slice(0,300),f:String(o.f||'').slice(0,24)};
+      if(o.s)photoSet=sanitizeSet(o.s);
+    }
+  }
+  if(!to&&!letter.m){to=decodeURIComponent((location.hash||'').slice(1)).replace(/_/g,' ')}
+  to=(to||'').trim().slice(0,24);
+  if(to)nameIn.value=to;
+  recipient=!!(to||letter.m||photoSet);
+  if(recipient){
+    $('#fieldwrap').hidden=true;$('#hintsmall').hidden=true;
+    var fl=$('#forline');fl.hidden=false;fl.textContent=to?('A song for '+to):'A song for you';
+    $('#chg2').hidden=true;
+    $('#chg1').textContent='Make one for someone you love';
+  }
+}catch(e){}
+loadPhotos(photoSet);
+probeRecorded();
+dbOpen(restoreUser);
+refreshLink();
+
+world=buildWorld(nm());
+renderWords();
+setLyric(-1);
+setPlayLabel();
+$('#clock').textContent='0:00 / '+fmt(D);
+requestAnimationFrame(frame);
+})();
+</script>
+<script>
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
+}
+</script>
+
+</body>
+</html>
