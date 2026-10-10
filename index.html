@@ -88,6 +88,17 @@ summary{cursor:pointer;font-weight:600}
 input[type=file]{font:inherit;color:var(--mute);max-width:100%}
 .note{color:var(--mute);font-size:.92rem;margin:0;max-width:66ch}
 .note code{color:var(--gold);font-family:inherit;font-weight:600}
+.forline{font-family:var(--fd);font-size:1.25rem;color:var(--gold)!important}
+a.btn{display:inline-block;text-decoration:none}
+.letter{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:rgba(255,255,255,.05);max-height:11rem;overflow:auto}
+.letter p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--fd);font-size:1.1rem;line-height:1.5;color:var(--ink)}
+.letter p.from{margin-top:8px;text-align:right;color:var(--gold);font-style:italic;font-size:1rem}
+.creator{display:grid;gap:14px;border-top:1px solid var(--line);padding-top:24px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.cgrid .wide{grid-column:1/-1}
+.cgrid .field,.creator .field{min-width:0}
+.copyrow{display:flex;flex-wrap:wrap;gap:10px}
+.copyrow input{flex:1 1 220px;min-width:0}
 @media (prefers-reduced-motion:reduce){.hi .w{animation:none}}
 </style>
 <style>html{background:#0b0e2c;color-scheme:dark}body{margin:0;font-size:14px}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
@@ -110,12 +121,13 @@ input[type=file]{font:inherit;color:var(--mute);max-width:100%}
             <p class="roman">Ek shaam tere naam</p>
           </div>
           <p>A Hindi love song written for this page, with a short film that is drawn fresh for every name. The tune plays as music and the words appear line by line.</p>
-          <div class="field">
+          <p class="forline" id="forline" hidden></p>
+          <div class="field" id="fieldwrap">
             <label for="name">Whose name goes in the chorus?</label>
             <input type="text" id="name" maxlength="24" placeholder="For example, Priya">
           </div>
           <div class="row2"><button class="btn main" type="submit" id="go">Play the film</button></div>
-          <span class="small">Sound starts when you press Play. Leave the name empty to use "Jaan".</span>
+          <span class="small" id="hintsmall">Sound starts when you press Play. Leave the name empty to use "Jaan".</span>
         </form>
       </div>
 
@@ -124,6 +136,7 @@ input[type=file]{font:inherit;color:var(--mute);max-width:100%}
           <h2 id="endhi"></h2>
           <p class="roman" id="endtr"></p>
           <p id="endtx">This evening is in your name.</p>
+          <div class="letter" id="letter" hidden><p id="lettertx"></p><p class="from" id="letterfrom"></p></div>
           <div class="row2">
             <button class="btn main" type="button" id="again1">Watch again</button>
             <button class="btn ghost" type="button" id="chg1">Try another name</button>
@@ -172,7 +185,24 @@ input[type=file]{font:inherit;color:var(--mute);max-width:100%}
     </details>
   </section>
 
-  <p class="note">To send this to someone, add <code>#</code> and their name to the end of the page link, for example <code>#Priya</code>. Their name will already be in the box when it opens. Use an underscore for a space.</p>
+  <section class="creator" id="creator">
+    <h2 class="sh">Make a link for someone you love</h2>
+    <p class="lead">Their name goes into the song, and your message appears as a letter when the film ends. Everything is stored inside the link itself, so there is nothing to sign up for.</p>
+    <div class="cgrid">
+      <div class="field"><label for="c-name">Their name</label><input type="text" id="c-name" maxlength="24" placeholder="For example, Priya"></div>
+      <div class="field"><label for="c-from">Your name, shown under the letter</label><input type="text" id="c-from" maxlength="24" placeholder="Optional"></div>
+      <div class="field wide"><label for="c-msg">Your message</label><textarea id="c-msg" maxlength="300" placeholder="Write a few lines from the heart"></textarea><span class="small" id="c-count">0 / 300</span></div>
+    </div>
+    <div class="field">
+      <label for="c-link">Your link</label>
+      <div class="copyrow"><input type="text" id="c-link" readonly><button class="btn main" type="button" id="c-copy">Copy link</button></div>
+    </div>
+    <div class="row2">
+      <a class="btn ghost" id="c-wa" href="#" target="_blank" rel="noopener">Send on WhatsApp</a>
+      <button class="btn ghost" type="button" id="c-try">Try it here first</button>
+    </div>
+    <span class="small" id="c-status"></span>
+  </section>
 </div>
 
 <script>
@@ -215,6 +245,7 @@ var mode='synth',aud=null,ownLines=[];
 var actx=null,t0=0,sil=null;
 var world=null;
 var lastIdx=-99;
+var letter={m:'',f:''},recipient=false;
 
 /* ---------- seeded world ---------- */
 function hashStr(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
@@ -608,10 +639,17 @@ function finish(){
   var n=playName;
   $('#endhi').textContent='ये शाम '+n+' के नाम';
   $('#endtr').textContent='Ye shaam '+n+' ke naam';
+  var lt=$('#letter');
+  if(letter.m){
+    $('#lettertx').textContent=letter.m;
+    $('#letterfrom').textContent=letter.f?'\u2014 '+letter.f:'';
+    lt.hidden=false;$('#endtx').hidden=true;
+  }else{lt.hidden=true;$('#endtx').hidden=false}
   $('#end').hidden=false;
   setPlayLabel();
 }
 function changeName(){
+  if(!recipient)letter={m:'',f:''};
   stopAll();started=false;playing=false;finished=false;lastIdx=-99;
   $('#end').hidden=true;$('#intro').hidden=false;
   $('#prog').style.width='0';$('#clock').textContent='0:00 / '+fmt(D);
@@ -644,7 +682,10 @@ function frame(ms){
 $('#f').addEventListener('submit',function(e){e.preventDefault();startFilm()});
 $('#playbtn').addEventListener('click',pauseResume);
 $('#again1').addEventListener('click',startFilm);
-$('#chg1').addEventListener('click',changeName);
+$('#chg1').addEventListener('click',function(){
+  if(recipient){var c=$('#creator');if(c&&c.scrollIntoView)c.scrollIntoView({behavior:'smooth'})}
+  else changeName();
+});
 $('#chg2').addEventListener('click',changeName);
 nameIn.addEventListener('input',function(){if(!started)renderWords()});
 
@@ -665,11 +706,68 @@ $('#own-reset').addEventListener('click',function(){
   aud=null;mode='synth';$('#audio-file').value='';$('#own-status').textContent='Using the original tune.';
 });
 
-/* name from the link, e.g. ...#Priya */
+/* ---------- links: ?d=<packed name+message> , ?to=Name , or #Name ---------- */
+function b64e(o){
+  var b=new TextEncoder().encode(JSON.stringify(o)),s='';
+  b.forEach(function(x){s+=String.fromCharCode(x)});
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64d(s){
+  s=s.replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length%4)s+='=';
+  var bin=atob(s),a=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(a));
+}
+function baseUrl(){return location.href.split(/[?#]/)[0]}
+function makeLink(){
+  var to=$('#c-name').value.trim().slice(0,24),fr=$('#c-from').value.trim().slice(0,24),m=$('#c-msg').value.trim().slice(0,300);
+  if(!to&&!fr&&!m)return baseUrl();
+  if(!fr&&!m)return baseUrl()+'?to='+encodeURIComponent(to);
+  return baseUrl()+'?d='+b64e({t:to,f:fr,m:m});
+}
+function refreshLink(){
+  var l=makeLink();
+  $('#c-link').value=l;
+  $('#c-count').textContent=$('#c-msg').value.length+' / 300';
+  $('#c-wa').href='https://wa.me/?text='+encodeURIComponent('I made a song for you: '+l);
+}
+['#c-name','#c-from','#c-msg'].forEach(function(sel){$(sel).addEventListener('input',refreshLink)});
+$('#c-copy').addEventListener('click',function(){
+  var el=$('#c-link'),st=$('#c-status');
+  refreshLink();el.focus();el.select();
+  var ok=function(){st.textContent='Link copied. Paste it into WhatsApp, Messenger or anywhere.'};
+  var no=function(){st.textContent='Press and hold the link above, then choose Copy.'};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(el.value).then(ok,no)}
+  else{try{document.execCommand('copy')?ok():no()}catch(e){no()}}
+});
+$('#c-try').addEventListener('click',function(){
+  nameIn.value=$('#c-name').value.trim().slice(0,24);
+  letter={m:$('#c-msg').value.trim().slice(0,300),f:$('#c-from').value.trim().slice(0,24)};
+  try{window.scrollTo({top:0,behavior:'smooth'})}catch(e){window.scrollTo(0,0)}
+  startFilm();
+});
 try{
-  var hsh=decodeURIComponent((location.hash||'').slice(1)).replace(/_/g,' ').trim().slice(0,24);
-  if(hsh)nameIn.value=hsh;
+  var qs=new URLSearchParams(location.search),to=qs.get('to'),dd=qs.get('d');
+  if(dd){
+    var o=b64d(dd);
+    if(o&&typeof o==='object'){
+      to=String(o.t||'');
+      letter={m:String(o.m||'').slice(0,300),f:String(o.f||'').slice(0,24)};
+    }
+  }
+  if(!to&&!letter.m){to=decodeURIComponent((location.hash||'').slice(1)).replace(/_/g,' ')}
+  to=(to||'').trim().slice(0,24);
+  if(to)nameIn.value=to;
+  recipient=!!(to||letter.m);
+  if(recipient){
+    $('#fieldwrap').hidden=true;$('#hintsmall').hidden=true;
+    var fl=$('#forline');fl.hidden=false;fl.textContent=to?('A song for '+to):'A song for you';
+    $('#chg2').hidden=true;
+    $('#chg1').textContent='Make one for someone you love';
+  }
 }catch(e){}
+refreshLink();
 
 world=buildWorld(nm());
 renderWords();
